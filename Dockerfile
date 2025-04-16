@@ -18,10 +18,10 @@ RUN npm install --production
 # Copy only necessary source files
 COPY *.js ./
 
-# Create standalone executable with stripped symbols
+# Create standalone executable with stripped symbols and optimized compression
 RUN pkg . --targets node18-alpine-x64 --output js-compressor && \
     strip --strip-all js-compressor && \
-    upx --ultra-brute --lzma js-compressor
+    upx --best --lzma js-compressor
 
 # Final stage - using scratch for absolute minimal size
 FROM scratch
