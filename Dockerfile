@@ -3,29 +3,31 @@ FROM node:18.19.1-alpine AS builder
 
 WORKDIR /app
 
-# Install pkg for creating standalone executables
-RUN npm install -g pkg
+# Install build tools and compression utilities
+RUN apk add --no-cache \
+    upx \
+    binutils \
+    && npm install -g pkg
 
-# Copy package files
+# Copy only package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install production dependencies only
+RUN npm install --production
 
-# Copy source code
-COPY . .
+# Copy only necessary source files
+COPY index.js ./
 
-# Create standalone executable
-RUN pkg . --targets node18-alpine-x64 --output js-compressor
+# Create standalone executable with stripped symbols
+RUN pkg . --targets node18-alpine-x64 --output js-compressor && \
+    strip --strip-all js-compressor && \
+    upx --ultra-brute --lzma js-compressor
 
-# Final stage - using alpine for minimal size while maintaining compatibility
-FROM alpine:3.19
+# Final stage - using scratch for absolute minimal size
+FROM scratch
 
-# Copy the standalone executable
-COPY --from=builder /app/js-compressor /usr/local/bin/js-compressor
+# Copy only the compressed executable
+COPY --from=builder /app/js-compressor /js-compressor
 
-# Create a non-root user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-USER appuser
-
-ENTRYPOINT ["js-compressor"] 
+# Set the entrypoint
+ENTRYPOINT ["/js-compressor"] 
