@@ -16,7 +16,7 @@ COPY package*.json ./
 RUN npm install --production
 
 # Copy only necessary source files
-COPY index.js ./
+COPY *.js ./
 
 # Create standalone executable with stripped symbols
 RUN pkg . --targets node18-alpine-x64 --output js-compressor && \
