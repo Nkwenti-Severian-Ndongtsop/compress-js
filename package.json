@@ -12,8 +12,15 @@
   "keywords": ["compression", "rle", "lz77", "cli"],
   "author": "",
   "license": "MIT",
+  "pkg": {
+    "scripts": "*.js",
+    "assets": [],
+    "targets": ["node18-alpine-x64"],
+    "outputPath": "js-compressor"
+  },
   "devDependencies": {
     "chai": "^4.3.10",
-    "mocha": "^10.2.0"
+    "mocha": "^10.2.0",
+    "pkg": "^5.8.1"
   }
 }
