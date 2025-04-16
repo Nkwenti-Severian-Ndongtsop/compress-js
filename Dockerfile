@@ -10,7 +10,7 @@ RUN npm install -g pkg
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm install
 
 # Copy source code
 COPY . .
