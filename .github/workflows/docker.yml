@@ -1,32 +1,28 @@
-name: Docker Build and Push
+# Use an official Node runtime as a parent image
+FROM node:18-alpine
 
-on:
-  push:
-    branches: [ master ]
+# Set the working directory in the container
+WORKDIR /app
 
-jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+# Copy package.json and package-lock.json (if available)
+COPY package*.json ./
 
-    steps:
-      - uses: actions/checkout@v4
+# Install build tools needed for some Node packages
+RUN apk add --no-cache python3 make g++
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+# Install app dependencies
+# Use a clean install to ensure reproducibility
+RUN npm ci --only=production
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+# Bundle app source
+COPY . .
 
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: ${{ github.event_name == 'push' }}
-          tags: ghcr.io/nkwenti-severian-ndongtsop/compress-js:latest
+# Make the CLI tool globally available within the container
+# This allows running it directly as compress-js
+RUN npm link
+
+# Define the entrypoint for the container
+ENTRYPOINT ["compress-js"]
+
+# Set default command (optional, useful for showing help)
+CMD ["--help"] 
