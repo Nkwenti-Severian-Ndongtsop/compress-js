@@ -1,33 +1,25 @@
-# Build stage
-FROM node:18.19.1-alpine AS builder
+# Use an official Node runtime as a parent image
+FROM node:18-alpine
 
+# Set the working directory in the container
 WORKDIR /app
 
-# Install build tools and compression utilities
-RUN apk add --no-cache \
-    upx \
-    binutils \
-    && npm install -g pkg
-
-# Copy only package files
+# Copy package.json and package-lock.json (if available)
 COPY package*.json ./
 
-# Install production dependencies only
-RUN npm install --production
+# Install app dependencies
+# Use a clean install to ensure reproducibility
+RUN npm ci --only=production
 
-# Copy only necessary source files
-COPY *.js ./
+# Bundle app source
+COPY . .
 
-# Create standalone executable with stripped symbols and optimized compression
-RUN pkg . --targets node18-alpine-x64 --output js-compressor && \
-    strip --strip-all js-compressor && \
-    upx --best --lzma js-compressor
+# Make the CLI tool globally available within the container
+# This allows running it directly as compress-js
+RUN npm link
 
-# Final stage - using scratch for absolute minimal size
-FROM scratch
+# Define the entrypoint for the container
+ENTRYPOINT ["compress-js"]
 
-# Copy only the compressed executable
-COPY --from=builder /app/js-compressor /js-compressor
-
-# Set the entrypoint
-ENTRYPOINT ["/js-compressor"] 
+# Set default command (optional, useful for showing help)
+CMD ["--help"] 
