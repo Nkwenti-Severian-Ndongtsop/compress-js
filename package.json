@@ -1,26 +1,34 @@
 {
-  "name": "js-compressor",
+  "name": "compress-js",
   "version": "1.0.0",
-  "description": "A simple CLI tool to compress and decompress files using RLE and LZ77 algorithms",
+  "description": "A simple CLI tool to compress and decompress files using RLE and LZ77 algorithms (JS version)",
   "main": "index.js",
   "bin": {
-    "js-compressor": "./index.js"
+    "compress-js": "./index.js"
   },
   "scripts": {
-    "test": "mocha test/*.test.js"
+    "test": "mocha test/*.test.js",
+    "start": "node index.js"
   },
-  "keywords": ["compression", "rle", "lz77", "cli"],
-  "author": "",
+  "keywords": [
+    "compress",
+    "decompress",
+    "rle",
+    "lz77",
+    "cli"
+  ],
+  "author": "Nkwenti Severian Ndongtsop <halamadrid651643565@gmail.com>",
   "license": "MIT",
-  "pkg": {
-    "scripts": "*.js",
-    "assets": [],
-    "targets": ["node18-alpine-x64"],
-    "outputPath": "js-compressor"
-  },
   "devDependencies": {
     "chai": "^4.3.10",
-    "mocha": "^10.2.0",
-    "pkg": "^5.8.1"
-  }
+    "mocha": "^10.8.2"
+    },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nkwenti-Severian-Ndongtsop/compress-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Nkwenti-Severian-Ndongtsop/compress-js/issues"
+  },
+  "homepage": "https://github.com/Nkwenti-Severian-Ndongtsop/compress-js#readme"
 }
