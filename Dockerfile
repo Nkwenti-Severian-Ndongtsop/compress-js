@@ -7,6 +7,9 @@ WORKDIR /app
 # Copy package.json and package-lock.json (if available)
 COPY package*.json ./
 
+# Install build tools needed for some Node packages
+RUN apk add --no-cache python3 make g++
+
 # Install app dependencies
 # Use a clean install to ensure reproducibility
 RUN npm ci --only=production
