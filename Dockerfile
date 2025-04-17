@@ -12,7 +12,7 @@ RUN apk add --no-cache python3 make g++
 
 # Install app dependencies
 # Use a clean install to ensure reproducibility
-RUN npm ci --only=production
+RUN npm install --only=production --verbose
 
 # Bundle app source
 COPY . .
