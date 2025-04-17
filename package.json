@@ -21,7 +21,8 @@
   "license": "MIT",
   "devDependencies": {
     "chai": "^4.3.10",
-    "mocha": "^10.8.2"
+    "mocha": "^10.8.2",
+    "pkg": "^5.8.1"
     },
   "repository": {
     "type": "git",
