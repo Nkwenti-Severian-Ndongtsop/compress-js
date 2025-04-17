@@ -1,28 +1,44 @@
-# Use an official Node runtime as a parent image
-FROM node:18-alpine
+# Stage 1: Builder
+FROM node:18-alpine AS builder
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if available)
-COPY package*.json ./
-
 # Install build tools needed for some Node packages
+# Do this before copying package.json to potentially cache this layer
 RUN apk add --no-cache python3 make g++
 
-# Install app dependencies
-# Use a clean install to ensure reproducibility
+# Copy package files
+COPY package*.json ./
+
+# Install production dependencies
+# Using npm ci for reproducibility if possible, otherwise use install
+# RUN npm ci --only=production
+# If ci failed previously, stick with install for now
 RUN npm install --only=production --verbose
 
-# Bundle app source
+# Copy the rest of the application source code
 COPY . .
 
-# Make the CLI tool globally available within the container
-# This allows running it directly as compress-js
-RUN npm link
+# If you have a build step (e.g., TypeScript), run it here
+# RUN npm run build
 
-# Define the entrypoint for the container
-ENTRYPOINT ["compress-js"]
+# Stage 2: Final image
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy production node_modules from builder stage
+COPY --from=builder /app/node_modules ./node_modules
+
+# Copy necessary source files and package.json
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/index.js ./
+COPY --from=builder /app/lz.js ./
+COPY --from=builder /app/rle.js ./
+
+# Define the entrypoint for the container to run the script directly
+# Assumes index.js is the main executable script
+ENTRYPOINT ["node", "./index.js"]
 
 # Set default command (optional, useful for showing help)
 CMD ["--help"] 
